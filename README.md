@@ -31,7 +31,7 @@ Both apps share a single MySQL database and are shipped as Docker containers.
 The only requirement is Docker (with the Compose plugin).
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/joshiabir/theapimiddleware.git
 cd theapimiddleware
 ./setup.sh
 ```
