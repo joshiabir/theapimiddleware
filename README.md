@@ -2,6 +2,8 @@
 
 A self-hosted API gateway with a built-in admin dashboard. Point your clients at the gateway — it enforces policies, scans for sensitive data, and proxies traffic to your backend services. The admin dashboard gives you full visibility and control without touching config files or redeploying.
 
+<img width="1469" height="745" alt="Screenshot 2026-04-02 at 3 59 27 PM" src="https://github.com/user-attachments/assets/384ee665-52b5-4068-b50c-e9a26e2a6654" />
+
 ## What's included
 
 | App | Role |
@@ -22,6 +24,7 @@ Both apps share a single MySQL database and are shipped as Docker containers.
 - **Security incidents** — DLP matches and policy violations are surfaced as incidents in the dashboard
 - **OAuth login** — admin dashboard supports Google, GitHub, and Microsoft login
 - **Team-based multi-tenancy** — each team manages its own domains, clusters, APIs, and policies
+<img width="1469" height="745" alt="Screenshot 2026-04-02 at 4 00 33 PM" src="https://github.com/user-attachments/assets/d6f622a4-85a8-4166-a29e-864653e898c7" />
 
 ## Quick start
 
