@@ -1,0 +1,113 @@
+services:
+
+  # ── Database ─────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"   # Optional: expose for local DB clients
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    restart: unless-stopped
+
+  # ── API Gateway (fiona) — http://localhost:8000 ─────────────────
+  fiona:
+    build:
+      context: ./fiona
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: "Fiona Gateway"
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_KEY: ${FIONA_APP_KEY}
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      QUEUE_CONNECTION: database
+      CACHE_STORE: database
+    volumes:
+      - fiona-storage:/var/www/app/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+      plucker:
+        condition: service_started
+    restart: unless-stopped
+
+  # ── Admin Dashboard (plucker-app) — http://localhost:8001 ───────
+  plucker:
+    build:
+      context: ./plucker-app
+    ports:
+      - "8001:8001"
+    environment:
+      APP_NAME: "API Middleware"
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_KEY: ${PLUCKER_APP_KEY}
+      APP_URL: http://localhost:8001
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      QUEUE_CONNECTION: database
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      MICROSOFT_APP_ID: ${MICROSOFT_APP_ID}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET}
+    volumes:
+      - plucker-storage:/var/www/app/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  plucker-worker:
+    build:
+      context: ./plucker-app
+    command: php artisan queue:listen --tries=3 --sleep=3
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_KEY: ${PLUCKER_APP_KEY}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      QUEUE_CONNECTION: database
+      CACHE_STORE: database
+    volumes:
+      - plucker-storage:/var/www/app/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+      plucker:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  fiona-storage:
+  plucker-storage:

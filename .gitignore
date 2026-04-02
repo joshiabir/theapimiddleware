@@ -1,0 +1,33 @@
+# Environment — never commit real credentials
+.env
+!.env.example
+
+# Laravel
+fiona/vendor/
+plucker-app/vendor/
+fiona/node_modules/
+plucker-app/node_modules/
+fiona/public/build/
+plucker-app/public/build/
+fiona/storage/app/
+plucker-app/storage/app/
+fiona/storage/framework/cache/
+plucker-app/storage/framework/cache/
+fiona/storage/framework/sessions/
+plucker-app/storage/framework/sessions/
+fiona/storage/framework/views/
+plucker-app/storage/framework/views/
+fiona/storage/logs/
+plucker-app/storage/logs/
+fiona/bootstrap/cache/
+plucker-app/bootstrap/cache/
+
+# SonarQube
+.scannerwork/
+
+# Local certs
+fiona/certs/
+
+# OS
+.DS_Store
+Thumbs.db
